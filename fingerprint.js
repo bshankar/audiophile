@@ -1,22 +1,23 @@
 const fs = require('fs')
 const audio = require('web-audio-api')
-const Speaker = require('speaker')
 
-const context = new audio.AudioContext()
-context.outStream = new Speaker({
-  channels: context.format.numberOfChannels,
-  bitDepth: context.format.bitDepth,
-  sampleRate: context.sampleRate
-})
+function getAudio (filename, cb) {
+  // get audio from filesystem
+  fs.readFile(filename, function (err, buf) {
+    if (err) throw err
 
-fs.readFile(process.argv[2], function (err, buf) {
-  if (err) throw err
-
-  context.decodeAudioData(buf, function (audioBuffer) {
-    const bufferNode = context.createBufferSource()
-    bufferNode.connect(context.destination)
-    bufferNode.buffer = audioBuffer
-    bufferNode.loop = true
-    bufferNode.start(0)
+    const context = new audio.AudioContext()
+    context.decodeAudioData(buf, audioBuffer => cb(audioBuffer))
   })
-})
+}
+
+function convertToMono (audioBuffer) {
+  // convert stereo audio to mono by averaging output of both speakers
+  const data = audioBuffer._data
+  for (let i = 0; i < data[0].length; ++i) {
+    data[0][i] = (data[0][i] + data[1][i]) / 2
+  }
+  audioBuffer._data = data.slice(0, 1)
+  return audioBuffer
+}
+
