@@ -7,16 +7,19 @@ def lowpass_filter(sig, cutoff=5000, fs=44100, order=6):
     return lfilter(b, a, sig)
 
 
-def truncate(sig, factor):
-    return sig[: factor * (len(sig) // factor)]
+def truncate(sig, fac):
+    return sig[: fac * (len(sig) // fac)]
 
 
-def downsample(sig, factor=4):
-    return np.mean(truncate(sig, factor).reshape(-1, factor), 1)
+def downsample(sig, fac=4):
+    return np.mean(truncate(sig, fac).reshape(-1, fac), 1)
 
 
-def apply_hamming(sig, fs=11025):
-    window_size = fs // 10
-    window = hamming(window_size, sym=False)
-    sig = truncate(sig, window_size)
-    return sig * np.tile(window, len(sig) // window_size)
+def apply_hamming(sig, ws=1024):
+    window = hamming(ws, sym=False)
+    sig = truncate(sig, ws)
+    return sig * np.tile(window, len(sig) // ws)
+
+
+def apply_fft(sig, fs=11025, ws=1024):
+    pass
