@@ -22,4 +22,4 @@ def apply_hamming(sig, ws=1024):
 
 
 def apply_fft(sig, fs=11025, ws=1024):
-    pass
+    return np.abs(np.fft.rfft(sig.reshape(-1, ws)))
