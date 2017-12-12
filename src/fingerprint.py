@@ -23,3 +23,15 @@ def apply_hamming(sig, ws=1024):
 
 def apply_fft(sig, fs=11025, ws=1024):
     return np.abs(np.fft.rfft(sig.reshape(-1, ws)))
+
+
+def strongest_bins(spg):
+    band_ranges = [[0, 10],  [10, 20], [20, 40],
+                   [40, 80], [80, 160], [160, 511]]
+
+    return [np.argmax(spg[start: end + 1])
+            for start, end in band_ranges]
+
+
+def global_strongest_bins_mean(spg):
+    pass
