@@ -61,14 +61,15 @@ def get_addresses(fspgs):
                                for i in range(len(fspgs))], []), 5)
     addresses = []
     for i in range(0, len(ordered_notes), 5):
-        print(i)
         if i + 5 < len(ordered_notes):
             anchors_part = ordered_notes[i + 2] * (1 << 18) + \
                 ordered_notes[i + 3] * (1 << 9) + \
                 ordered_notes[i + 4]
-            # add dt1, dt2, dt3 for the next 5 points
-            # and append to addresses
-
+            for j in range(i + 5, i + 10):
+                dt_part = note_times[j] - note_times[i + 2] * (1 << 24) + \
+                    note_times[j] - note_times[i + 3] * (1 << 12) + \
+                    note_times[j] - note_times[i + 4]
+                addresses.append(anchors_part * (1 << 36) + dt_part)
     return addresses
 
 
