@@ -1,4 +1,5 @@
 import numpy as np
+import soundfile as sf
 from scipy.signal import butter, lfilter, hamming
 
 
@@ -44,9 +45,32 @@ def global_strongest_amplitudes_mean(bins):
     return np.mean(np.max(bins[..., 1], axis=0))
 
 
-def get_filtered_spectrogram(sig, k=0.05):
+def get_filtered_spectrogram(sig, k=0.1):
     spgs = get_spectrograms(sig)
     bins = get_strongest_bins(spgs)
     mean = global_strongest_amplitudes_mean(bins)
-    return [[int(bins[i, j, 0]) for j in range(6) if bins[i, j, 1] > k * mean]
+    return [[int(bins[i, j, 0]) for j in range(6)
+             if bins[i, j, 1] > k * mean].sort()
             for i in range(len(bins))]
+
+
+def get_addresses(fspgs):
+    # freqs(ordered), times --> addresses
+    ordered_notes = truncate(sum(fspgs, []), 5)
+    note_times = truncate(sum([[i] * len(fspgs[i])
+                               for i in range(len(fspgs))], []), 5)
+    addresses = []
+    for i in range(0, len(ordered_notes), 5):
+        print(i)
+        if i + 5 < len(ordered_notes):
+            anchors_part = ordered_notes[i + 2] * (1 << 18) + \
+                ordered_notes[i + 3] * (1 << 9) + \
+                ordered_notes[i + 4]
+            # add dt1, dt2, dt3 for the next 5 points
+            # and append to addresses
+
+    return addresses
+
+
+def add_to_database(addresses, song_info):
+    pass
