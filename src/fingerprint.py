@@ -1,6 +1,5 @@
 import numpy as np
 from scipy.signal import butter, lfilter, hamming
-import soundfile as sf
 
 
 def lowpass_filter(sig, cutoff=5000, fs=44100, order=6):
@@ -33,17 +32,21 @@ def get_spectrograms(sig):
 def get_strongest_bins(spg):
     band_ranges = [[0, 10],  [10, 20], [20, 40],
                    [40, 80], [80, 160], [160, 511]]
-    return np.array([np.argmax(spg[start: end])
+    return np.array([(np.argmax(spg[start: end]), np.max(spg[start: end]))
                      for start, end in band_ranges])
 
 
-get_strongest_bins = np.vectorize(get_strongest_bins, signature='(m)->(n)')
+get_strongest_bins = np.vectorize(get_strongest_bins, signature='(m)->(n,p)')
 
 
-def global_strongest_bins_mean(spgs):
-    all_strongest_bins = get_strongest_bins(spgs)
-    return all_strongest_bins
+def global_strongest_amplitudes_mean(bins):
+    print(np.max(bins[..., 1], axis=0))
+    return np.mean(np.max(bins[..., 1], axis=0))
 
 
-def get_filtered_spectrogram(sig):
-    pass
+def get_filtered_spectrogram(sig, k=0.05):
+    spgs = get_spectrograms(sig)
+    bins = get_strongest_bins(spgs)
+    mean = global_strongest_amplitudes_mean(bins)
+    return [[int(bins[i, j, 0]) for j in range(6) if bins[i, j, 1] > k * mean]
+            for i in range(len(bins))]
