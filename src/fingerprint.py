@@ -60,6 +60,7 @@ def get_addresses(fspgs):
     note_times = truncate(sum([[i] * len(fspgs[i])
                                for i in range(len(fspgs))], []), 5)
     addresses = []
+    anchored_note_times = []
     for i in range(0, len(ordered_notes), 5):
         if i + 5 < len(ordered_notes):
             anchors_part = ordered_notes[i + 2] * (1 << 18) + \
@@ -71,4 +72,5 @@ def get_addresses(fspgs):
                     note_times[j] - note_times[i + 3] * (1 << 8) + \
                     note_times[j] - note_times[i + 4]
                 addresses.append(anchors_part * (1 << 33) + dt_part)
-    return addresses
+                anchored_note_times.append(note_times[i + j])
+    return addresses, anchored_note_times
