@@ -1,3 +1,4 @@
+import fingerprint as fp
 import soundfile as sf
 import os
 import taglib
@@ -6,6 +7,7 @@ import taglib
 def read_mp3(filename):
     # get tags
     song = taglib.File(filename)
+    assert song.length < 800, "Maximum allowed song length is 13 minutes"
 
     # get the signal
     name, ext = os.path.splitext(filename)
