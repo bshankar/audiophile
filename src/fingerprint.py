@@ -44,12 +44,12 @@ def global_strongest_amplitudes_mean(bins):
     return np.mean(np.max(bins[..., 1], axis=0))
 
 
-def get_filtered_spectrogram(sig, k=0.1):
+def get_filtered_spectrogram(sig, k=0.25):
     spgs = get_spectrograms(sig)
     bins = get_strongest_bins(spgs)
     mean = global_strongest_amplitudes_mean(bins)
-    return [[int(bins[i, j, 0]) for j in range(6)
-             if bins[i, j, 1] > k * mean].sort()
+    return [sorted([int(bins[i, j, 0]) for j in range(6)
+                    if bins[i, j, 1] > k * mean])
             for i in range(len(bins))]
 
 
@@ -66,10 +66,10 @@ def get_addresses(fspgs):
                 ordered_notes[i + 3] * (1 << 9) + \
                 ordered_notes[i + 4]
             for j in range(i + 5, i + 10):
-                dt_part = ordered_notes[i + j] * (1 << 24) + \
+                dt_part = ordered_notes[j] * (1 << 24) + \
                     note_times[j] - note_times[i + 2] * (1 << 16) + \
                     note_times[j] - note_times[i + 3] * (1 << 8) + \
                     note_times[j] - note_times[i + 4]
                 addresses.append(anchors_part * (1 << 33) + dt_part)
-                anchored_note_times.append(note_times[i + j])
+                anchored_note_times.append(note_times[j])
     return addresses, anchored_note_times
