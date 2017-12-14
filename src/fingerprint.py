@@ -44,7 +44,7 @@ def global_strongest_amplitudes_mean(bins):
     return np.mean(np.max(bins[..., 1], axis=0))
 
 
-def get_filtered_spectrogram(sig, k=0.25):
+def get_filtered_spectrogram(sig, k=0.6):
     spgs = get_spectrograms(sig)
     bins = get_strongest_bins(spgs)
     mean = global_strongest_amplitudes_mean(bins)
@@ -54,22 +54,23 @@ def get_filtered_spectrogram(sig, k=0.25):
 
 
 def get_addresses(fspgs):
-    # freqs(ordered), times --> addresses
-    ordered_notes = truncate(sum(fspgs, []), 5)
-    note_times = truncate(sum([[i] * len(fspgs[i])
-                               for i in range(len(fspgs))], []), 5)
+    ordered_notes = sum(fspgs, [])
+    note_times = sum([[i] * len(fspgs[i]) for i in range(len(fspgs))], [])
     addresses = []
     anchored_note_times = []
-    for i in range(0, len(ordered_notes), 5):
-        if i + 5 < len(ordered_notes):
-            anchors_part = ordered_notes[i + 2] * (1 << 18) + \
-                ordered_notes[i + 3] * (1 << 9) + \
-                ordered_notes[i + 4]
-            for j in range(i + 5, i + 10):
-                dt_part = ordered_notes[j] * (1 << 24) + \
-                    note_times[j] - note_times[i + 2] * (1 << 16) + \
-                    note_times[j] - note_times[i + 3] * (1 << 8) + \
-                    note_times[j] - note_times[i + 4]
-                addresses.append(anchors_part * (1 << 33) + dt_part)
-                anchored_note_times.append(note_times[j])
+    for i in range(0, len(ordered_notes) - 2):
+        anchors_part = (ordered_notes[i] << 18) + \
+            (ordered_notes[i + 1] << 9) + \
+            ordered_notes[i + 2]
+
+        j = i + 3
+        while j < i + 8 and j < len(ordered_notes):
+            dt_part = (ordered_notes[j] << 24) + \
+                (note_times[j] - note_times[i] << 16) + \
+                (note_times[j] - note_times[i + 1] << 8) + \
+                note_times[j] - note_times[i + 2]
+
+            addresses.append((anchors_part << 33) + dt_part)
+            anchored_note_times.append(note_times[j])
+            j += 1
     return addresses, anchored_note_times
