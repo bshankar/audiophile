@@ -1,11 +1,17 @@
 import soundfile as sf
 import os
+import taglib
 
 
-def readSound(filename):
-    name, ext = os.path.splittext(filename)
-    if ext != '.wav':
-        os.system('ffmpeg -i %s -o %s%s' % (filename, name, '.wav'))
+def read_mp3(filename):
+    # get tags
+    song = taglib.File(filename)
 
-    filename = name + '.wav'
-    return sf.read(filename)
+    # get the signal
+    name, ext = os.path.splitext(filename)
+    os.system('ffmpeg -i %s %s%s' % (filename, name, '.wav'))
+    _filename = name + '.wav'
+    sig, fs = sf.read(_filename)  # extract the signal
+    os.remove(_filename)
+
+    return os.path.basename(filename), song.tags, sig
