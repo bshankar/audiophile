@@ -41,7 +41,6 @@ get_strongest_bins = np.vectorize(get_strongest_bins, signature='(m)->(n,p)')
 
 
 def global_strongest_amplitudes_mean(bins):
-    print(np.max(bins[..., 1], axis=0))
     return np.mean(np.max(bins[..., 1], axis=0))
 
 
