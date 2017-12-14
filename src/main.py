@@ -11,6 +11,7 @@ try:
     else:
         raise Exception("Invalid option")
 except Exception:
-    print("Learn a song: $ python main.py learn <path to audio file>")
-    print("Listen to mic: $ python main.py listen <time>")
-    print("Search an audio clip: $ python main.py search <path to clip>")
+    print("Usage: \n")
+    print("$ python main.py learn <path to audio file>")
+    print("$ python main.py listen <time in seconds>")
+    print("$ python main.py search <path to clip>")
