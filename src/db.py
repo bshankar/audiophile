@@ -1,5 +1,4 @@
 import redis
-import numpy as np
 r = redis.StrictRedis()
 
 
