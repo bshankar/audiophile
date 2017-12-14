@@ -7,6 +7,12 @@ import hashlib
 import os
 
 
+def convert_to_mono(sig):
+    if len(sig.shape) > 1:
+        return fp.np.mean(sig, axis=1)
+    return sig
+
+
 def read_audiofile(filename):
     # get tags
     song = taglib.File(filename)
@@ -14,12 +20,12 @@ def read_audiofile(filename):
 
     # get the signal
     name, ext = os.path.splitext(filename)
-    os.system('ffmpeg -i %s %s%s' % (filename, name, '.wav'))
+    os.system('ffmpeg -loglevel 8 -i %s %s%s' % (filename, name, '.wav'))
     _filename = name + '.wav'
     sig, fs = sf.read(_filename)  # extract the signal
     os.remove(_filename)
 
-    return os.path.basename(filename), song.tags, sig
+    return os.path.basename(filename), song.tags, convert_to_mono(sig)
 
 
 def hash_metadata(filename, tags, bits=51):
