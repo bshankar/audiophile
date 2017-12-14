@@ -1,7 +1,10 @@
 import fingerprint as fp
+import db
+
 import soundfile as sf
-import os
 import taglib
+import hashlib
+import os
 
 
 def read_mp3(filename):
@@ -17,3 +20,9 @@ def read_mp3(filename):
     os.remove(_filename)
 
     return os.path.basename(filename), song.tags, sig
+
+
+def hash(filename, tags, bits=51):
+    basename = os.path.basename(filename).encode('utf-8')
+    m = hashlib.md5(b'%s' % basename)
+    return int('0x' + m.hexdigest(), 16) >> (128 - bits)
