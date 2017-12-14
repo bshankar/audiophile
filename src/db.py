@@ -1,4 +1,5 @@
 import redis
+import numpy as np
 r = redis.StrictRedis()
 
 
@@ -14,8 +15,13 @@ def search(addresses):
         info = r.get('note:' + str(add))
         if info is not None:
             song_name = r.get('song:' + str(int(info) >> 13))
+            song_time = int(info) & 8191
             if song_name in results:
-                results[song_name] += 1
+                results[song_name][0] += 1
+                dt = song_time - results[song_name][2]
+                if dt == 1:
+                    results[song_name][1] += 1
+                results[song_name][2] = song_time
             else:
-                results[song_name] = 1
-    return results
+                results[song_name] = [1, 0, song_time]
+    return {s: [results[s][0], results[s][1]] for s in results}

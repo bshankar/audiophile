@@ -5,7 +5,7 @@ try:
     if sys.argv[1] == 'learn':
         su.learn_song(sys.argv[2])
     elif sys.argv[1] == 'search':
-        su.identify_clip(sys.argv[2])
+        print(su.identify_clip(sys.argv[2]))
     elif sys.argv[1] == 'listen':
         print("not implemented yet!")
     else:
