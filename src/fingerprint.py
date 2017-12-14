@@ -66,12 +66,9 @@ def get_addresses(fspgs):
                 ordered_notes[i + 3] * (1 << 9) + \
                 ordered_notes[i + 4]
             for j in range(i + 5, i + 10):
-                dt_part = note_times[j] - note_times[i + 2] * (1 << 24) + \
-                    note_times[j] - note_times[i + 3] * (1 << 12) + \
+                dt_part = ordered_notes[i + j] * (1 << 24) + \
+                    note_times[j] - note_times[i + 2] * (1 << 16) + \
+                    note_times[j] - note_times[i + 3] * (1 << 8) + \
                     note_times[j] - note_times[i + 4]
-                addresses.append(anchors_part * (1 << 36) + dt_part)
+                addresses.append(anchors_part * (1 << 33) + dt_part)
     return addresses
-
-
-def add_to_database(addresses, song_info):
-    pass
