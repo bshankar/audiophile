@@ -31,8 +31,8 @@ def get_spectrograms(sig):
 
 
 def get_strongest_bins(spg):
-    band_ranges = [[0, 10],  [10, 20], [20, 40],
-                   [40, 80], [80, 160], [160, 511]]
+    band_ranges = [[0, 20],  [20, 40], [40, 80],
+                   [80, 120], [120, 180], [180, 400]]
     return np.array([(np.argmax(spg[start: end]), np.max(spg[start: end]))
                      for start, end in band_ranges])
 
@@ -44,7 +44,7 @@ def global_strongest_amplitudes_mean(bins):
     return np.mean(np.max(bins[..., 1], axis=0))
 
 
-def get_filtered_spectrogram(sig, k=0.6):
+def get_filtered_spectrogram(sig, k=0.35):
     spgs = get_spectrograms(sig)
     bins = get_strongest_bins(spgs)
     mean = global_strongest_amplitudes_mean(bins)
@@ -64,7 +64,7 @@ def get_addresses(fspgs):
             ordered_notes[i + 2]
 
         j = i + 3
-        while j < i + 8 and j < len(ordered_notes):
+        while j < i + 10 and j < len(ordered_notes):
             dt_part = (ordered_notes[j] << 24) + \
                 (note_times[j] - note_times[i] << 16) + \
                 (note_times[j] - note_times[i + 1] << 8) + \
