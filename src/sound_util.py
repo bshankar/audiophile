@@ -58,14 +58,14 @@ def learn_songs(_dir):
 def identify_clip(filename):
     song_name, tags, sig = read_audiofile(filename)
     addresses, times = fp.get_addresses(fp.get_filtered_spectrogram(sig))
-    return db.show_results(db.search(addresses, times))
+    return db.show_results(db.search(addresses, times), 3)
 
 
 def identify_from_mic(time=20):
     print("Listening...")
-    filename = os.path.join(sys.path[0] + '/record.wav')
-    os.system('ffmpeg -loglevel 8 -f alsa -i hw:1 -t %d %s' %
+    filename = os.path.join(sys.path[0] + '/record.mp3')
+    os.system('ffmpeg -ar 44100 -f alsa -i hw:1 -t %d %s' %
               (time, filename))
     results = identify_clip(filename)
-    # os.remove(filename)
+    os.remove(filename)
     return results
