@@ -5,6 +5,8 @@ import soundfile as sf
 import taglib
 import hashlib
 import os
+import glob
+import sys
 
 
 def convert_to_mono(sig):
@@ -16,11 +18,12 @@ def convert_to_mono(sig):
 def read_audiofile(filename):
     # get tags
     song = taglib.File(filename)
+    print(filename)
     assert song.length < 800, "Maximum allowed song length is 13 minutes"
 
     # get the signal
     name, ext = os.path.splitext(filename)
-    os.system('ffmpeg -loglevel 8 -i %s %s%s' % (filename, name, '.wav'))
+    os.system('ffmpeg -loglevel 8 -i "%s" "%s%s"' % (filename, name, '.wav'))
     _filename = name + '.wav'
     sig, fs = sf.read(_filename)  # extract the signal
     os.remove(_filename)
@@ -43,8 +46,26 @@ def learn_song(filename):
     db.store(addresses, times, hash_metadata(filename, tags), name)
 
 
+def learn_songs(_dir):
+    for filename in glob.glob(_dir + '/**/*.[Mm]p3', recursive=True):
+        song = taglib.File(filename)
+        if song.length < 800:
+            learn_song(filename)
+        else:
+            print('Skipping %s (too long)')
+
+
 def identify_clip(filename):
     song_name, tags, sig = read_audiofile(filename)
     addresses, times = fp.get_addresses(fp.get_filtered_spectrogram(sig))
+    return db.show_results(db.search(addresses, times))
 
-    return db.search(addresses)
+
+def identify_from_mic(time=20):
+    print("Listening...")
+    filename = os.path.join(sys.path[0] + '/record.wav')
+    os.system('ffmpeg -loglevel 8 -f alsa -i hw:1 -t %d %s' %
+              (time, filename))
+    results = identify_clip(filename)
+    # os.remove(filename)
+    return results
