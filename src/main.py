@@ -9,7 +9,7 @@ try:
     elif sys.argv[1] == 'search':
         print(su.identify_clip(sys.argv[2]))
     elif sys.argv[1] == 'listen':
-        print(su.identify_from_mic(int(sys.argv[2], int(sys.argv[3]))))
+        print(su.identify_from_mic(int(sys.argv[2]), int(sys.argv[3])))
     else:
         raise Exception("Invalid option")
 except Exception:
