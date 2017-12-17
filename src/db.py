@@ -31,7 +31,7 @@ def filter_results(results):
     for s in results:
         dts = {i: results[s][1].count(i) for i in results[s][1]}
         dts_matched = max(dts.values())
-        if dts_matched > 1:
+        if dts_matched > 10:
             filtered[s] = (results[s][0], dts_matched)
     return filtered
 
