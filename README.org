@@ -1,0 +1,49 @@
+* audiophile
+
+A program that can learn and recognize audio files by fingerprinting
+them. If one of these sounds are playing nearby, it can recognize it
+after listening to it for 15-30s even if there is some noise in the background.
+
+Audiophile looks for at the frequencies and time gaps between notes
+to match. If the original audio file is manipulated in some way
+(changed pitch or tempo) or is a different recording of the same song
+(like a live version), it may not not match most of the time! This can
+be overcome by making it learn all the popular versions of a song.
+
+* Installation
+
+ - Needs ffmpeg to record audio and convert various audio formats to WAV.
+ - Install pipenv and clone this repository.
+ - Once inside the project folder, do
+
+#+BEGIN_SRC shell
+pipenv install
+#+END_SRC
+
+* Usage
+
+To learn all the songs in a folder
+
+#+BEGIN_SRC shell
+pipenv run python src/main.py learnall <folder>
+#+END_SRC
+
+To learn a particular song
+
+#+BEGIN_SRC shell
+pipenv run python src/main.py learn <audio file>
+#+END_SRC
+
+To match a recorded clip with all known songs
+
+#+BEGIN_SRC shell
+pipenv run python src/main.py search <audio file>
+#+END_SRC
+
+To listen to something playing outside and match with all known songs
+
+#+BEGIN_SRC shell
+pipenv run python src/main.py listen <time in seconds> <sound card>
+#+END_SRC
+
+sound card is 0 on most systems.
