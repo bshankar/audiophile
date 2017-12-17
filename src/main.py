@@ -9,7 +9,7 @@ try:
     elif sys.argv[1] == 'search':
         print(su.identify_clip(sys.argv[2]))
     elif sys.argv[1] == 'listen':
-        print(su.identify_from_mic(sys.argv[2]))
+        print(su.identify_from_mic(int(sys.argv[2])))
     else:
         raise Exception("Invalid option")
 except Exception:
@@ -18,3 +18,5 @@ except Exception:
     print("$ python main.py learn <directory containing audio files>")
     print("$ python main.py listen <time in seconds>")
     print("$ python main.py search <path to clip>")
+
+    raise Exception
