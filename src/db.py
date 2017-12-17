@@ -1,22 +1,40 @@
-import redis
-import operator
-r = redis.StrictRedis()
+import sqlite3
+conn = sqlite3.connect('audiophile.db')
+c = conn.cursor()
+
+
+def create_tables():
+    c.execute('''CREATE TABLE if not exists fingerprint
+             (quad UNSIGNED BIG INT PRIMARY KEY ON CONFLICT REPLACE,
+              songid_time INTEGER)''')
+    c.execute('''CREATE TABLE if not exists songs
+              (songid UNSIGNED BIG INT PRIMARY KEY ON CONFLICT REPLACE,
+               song_name TEXT,
+               FOREIGN KEY(songid) REFERENCES fingerprint(songid_time))''')
+    conn.commit()
 
 
 def store(addresses, times, song_hash, song_name):
+    create_tables()
     for i in range(len(addresses)):
-        r.set('note:' + str(addresses[i]), (song_hash << 13) + times[i])
-    r.set('song:%d' % song_hash, song_name)
+        c.execute('INSERT into fingerprint VALUES (?, ?)',
+                  (addresses[i], (song_hash << 13) + times[i]))
+    c.execute('INSERT INTO songs VALUES (?, ?)', (song_hash, song_name))
+    conn.commit()
 
 
 def search(addresses, times):
     results = {}
     for i in range(len(addresses)):
         add = addresses[i]
-        info = r.get('note:' + str(add))
+        c.execute('SELECT songid_time FROM fingerprint WHERE quad = ?', (add,))
+        info = c.fetchone()
         if info is not None:
-            song_name = r.get('song:' + str(int(info) >> 13))
-            song_time = int(info) & 8191
+            info = info[0]
+            c.execute('SELECT song_name FROM songs WHERE songid = ?',
+                      (info >> 13,))
+            song_name = c.fetchone()[0]
+            song_time = info & 8191
             if song_name in results:
                 results[song_name][0] += 1
                 results[song_name][1].append(song_time - times[i])
