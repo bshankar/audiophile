@@ -61,11 +61,11 @@ def identify_clip(filename):
     return db.show_results(db.search(addresses, times), 3)
 
 
-def identify_from_mic(time=20):
+def identify_from_mic(time=20, sound_device=0):
     print("Listening...")
     filename = os.path.join(sys.path[0] + '/record.mp3')
-    os.system('ffmpeg -ar 44100 -f alsa -i hw:1 -t %d %s' %
-              (time, filename))
+    os.system('ffmpeg -loglevel 8 -ar 44100 -f alsa -i hw:%d -t %d %s' %
+              (sound_device, time, filename))
     results = identify_clip(filename)
     os.remove(filename)
     return results
